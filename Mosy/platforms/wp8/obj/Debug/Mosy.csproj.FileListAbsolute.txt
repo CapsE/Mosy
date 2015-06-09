@@ -1,0 +1,14 @@
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\ApplicationIcon.png
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\Background.png
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\com.phonegap.helloworld.dll
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\com.phonegap.helloworld.pdb
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\AppManifest.xaml
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\Properties\WMAppManifest.xml
+D:\GitHub\Mosy\Mosy\platforms\wp8\Bin\Debug\CordovaAppProj_Debug_AnyCPU.xap
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\App.g.cs
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\cordovalib\CordovaView.g.cs
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\MainPage.g.cs
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\com.phonegap.helloworld.g.resources
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\com.phonegap.helloworld.dll
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\com.phonegap.helloworld.pdb
+D:\GitHub\Mosy\Mosy\platforms\wp8\obj\Debug\XapCacheFile.xml
