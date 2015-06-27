@@ -4,7 +4,7 @@
     <Languages xmlns="">
         <Language code="en-US" />
     </Languages>
-    <App Author="Mosy author" BitsPerPixel="32" Description="Apache Cordova for Windows Phone" Genre="apps.normal" ProductID="{b8e53b70-fe35-11e4-af37-83515d5012a2}" Publisher="Mosy" PublisherID="{db093ed5-53b1-45f7-af72-751e8f36ab80}" RuntimeType="Silverlight" Title="Mosy" Version="1.0.0" xmlns="">
+    <App Author="Mosy Author" BitsPerPixel="32" Description="Apache Cordova for Windows Phone" Genre="apps.normal" ProductID="{3dfc34b0-1ce7-11e5-bc59-4de23bb17f81}" Publisher="Mosy Publisher" PublisherID="{db093ed5-53b1-45f7-af72-751e8f36ab80}" RuntimeType="Silverlight" Title="Mosy" Version="1.0.0" xmlns="">
         <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
         <Capabilities>
             <Capability Name="ID_CAP_WEBBROWSERCOMPONENT" />
@@ -15,12 +15,12 @@
             <DefaultTask Name="_default" NavigationPage="MainPage.xaml" />
         </Tasks>
         <Tokens>
-            <PrimaryToken TaskName="_default" TokenID="MosyToken">
+            <PrimaryToken TaskName="_default" TokenID="Mosy">
                 <TemplateFlip>
                     <SmallImageURI IsRelative="true" IsResource="false">Background.png</SmallImageURI>
                     <Count>0</Count>
                     <BackgroundImageURI IsRelative="true" IsResource="false">Background.png</BackgroundImageURI>
-                    <Title>Mosy</Title>
+                    <Title>HelloCordova</Title>
                     <BackContent />
                     <BackBackgroundImageURI />
                     <BackTitle />

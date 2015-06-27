@@ -26,6 +26,8 @@ var x = 200;
 var y = 200;
 var dx = 0;
 var dy = 0;
+var lockX;
+var lockY;
 var screenWidth = 0;
 var screenHeight = 0;
 var xStep = 0;
@@ -49,8 +51,6 @@ var app = {
         
         window.setInterval(GetAccData, 250);
         window.setInterval(update, 35);
-
-        alert("Updated");
     },
     // Bind Event Listeners
     //
@@ -86,7 +86,7 @@ function accelerometerSuccess(a){
     if(isNum(a.x) && isNum(a.y)){
         dx = a.x * -1;    
         dy = a.y;
-        out.innerHTML = "x: " + dx.toString() + " y: " + dy.toString();
+        out.innerHTML = "x: " + Math.floor(-1 * dx - xStep+15).toString() + " y: " + Math.floor(-1 * dy * yStep).toString();
     }
     searching = 0;
 }
@@ -109,19 +109,49 @@ function accelerometerSuccessActual(acceleration){
     accelerometerSuccess(acceleration);
 }
 
+function Lerp(xa,xb){
+    var delta = xa -xb;
+    return delta/4;
+}
+
 function update(){
     ctx.clearRect ( 0,0,9000,9000);
     
-    x = dx * xStep + screenWidth/2 -50;
-    y = dy * yStep + screenHeight/2 -50;
-    ctx.fillRect(x, y, 100, 100);
+    var tx = -1 * dx * xStep + screenWidth/2;
+    var ty = -1 * dy * yStep + screenHeight/2;
+    x = x - Math.min(Lerp(x, tx), 10);
+    y = y - Math.min(Lerp(y, ty), 10);
+    
+    if(lockX && lockY){
+        ctx.beginPath();
+        ctx.arc(lockX, lockY, 50, 0, 2*Math.PI);
+        ctx.fillStyle="LightGray";
+        ctx.fill();
+    }
+    
+    ctx.beginPath();
+    ctx.arc(x, y, 50, 0, 2*Math.PI);
+    ctx.fillStyle="black";
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.moveTo(x , y -50);
+    ctx.lineTo(x , y + 50);
+    ctx.moveTo(x -50, y);
+    ctx.lineTo(x +50, y);
+    ctx.strokeStyle="white";
+    ctx.stroke();
+    
+
     
     ctx.beginPath();
     ctx.moveTo(screenWidth/2,0);
     ctx.lineTo(screenWidth/2,screenHeight);
     ctx.moveTo(0, screenHeight/2);
     ctx.lineTo(screenWidth,screenHeight/2);
-    ctx.strokeStyle="red";
+    ctx.strokeStyle="blue";
+    ctx.arc(screenWidth/2, screenHeight/2, 100, 0, Math.PI*2);
+    ctx.arc(screenWidth/2, screenHeight/2, screenWidth/2, 0, Math.PI*2);
     ctx.stroke();
 }
 
@@ -138,4 +168,9 @@ function isNum(n){
         return true;
     }
     return false;
+}
+
+function LockPosition(){
+    lockX = x;
+    lockY = y;
 }

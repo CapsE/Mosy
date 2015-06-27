@@ -16,9 +16,11 @@
         }
     </style>
     <body>
-        <div class="app">
-            <div id="out" style="background:green;"></div>
-            <canvas id="myCanvas" style=""></canvas>
+        <div class="app" style="width:100%; height:100%; overflow:hidden;">
+            <div id="out" style="background:blue; width:100%; height:25px; position:absolute; color:white;">               
+            </div>
+            <img src="button.png" style="position:absolute; top:30px; right:0px; z-index:10; margin:5px;" onclick="LockPosition()"></img>
+            <canvas id="myCanvas" style="position:absolute;  z-index:0;"></canvas>
         </div>
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
