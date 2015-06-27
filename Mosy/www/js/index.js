@@ -16,7 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+//Globale Variablendeklaration
 var out;
+var out2;
 var canvas;
 var ctx;
 var searching = 0;
@@ -28,6 +31,7 @@ var dx = 0;
 var dy = 0;
 var lockX;
 var lockY;
+var lockActive = false;
 var screenWidth = 0;
 var screenHeight = 0;
 var xStep = 0;
@@ -39,6 +43,7 @@ var app = {
         this.bindEvents();
         canvas = document.getElementById("myCanvas");
         out = document.getElementById("out");
+        out2 = document.getElementById("out2");
         screenWidth =  window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         screenHeight =  window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
         
@@ -52,23 +57,20 @@ var app = {
         window.setInterval(GetAccData, 250);
         window.setInterval(update, 35);
     },
+    
     // Bind Event Listeners
-    //
-    // Bind any events that are required on startup. Common events are:
-    // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
 
     },
+    
     // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
         searching = 0;
         Alert("Device Ready");
     },
+    
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         var parentElement = document.getElementById(id);
@@ -82,46 +84,46 @@ var app = {
     },
 };
 
+//Eventhandler um erfolgreiches Erhalten von Accelerometerdaten zu behandeln
 function accelerometerSuccess(a){
     if(isNum(a.x) && isNum(a.y)){
         dx = a.x * -1;    
         dy = a.y;
-        out.innerHTML = "x: " + Math.floor(-1 * dx - xStep+15).toString() + " y: " + Math.floor(-1 * dy * yStep).toString();
+        out.innerHTML = "x: " + Math.floor(-1 * dx * xStep).toString() + " y: " + Math.floor(-1 * dy * yStep).toString();
+        if (lockActive) {
+            lockActive = false;
+            out2.innerHTML = "saved x: " + Math.floor(-1 * dx * xStep).toString() + " y: " + Math.floor(-1 * dy * yStep).toString();
+        }
     }
     searching = 0;
 }
 
+//Eventhandler um fehlgeschlagenes Erhalten von Accelerometerdaten zu behandeln
 function accelerometerError(){
     out.innerHTML = "Error!";
     searching = 0;
 }
 
+//Anforderung an den Sensor. Begrenzt auf maximal 1000 unbeantwortete Fragen.
 function GetAccData(){
     if(searching < 1000){
         searching += 1;
-        navigator.accelerometer.getCurrentAcceleration(accelerometerSuccessActual, accelerometerError);
+        navigator.accelerometer.getCurrentAcceleration(accelerometerSuccess, accelerometerError);
     }else{
         out.innerHTML = "Still searching...";
     }
 }
 
-function accelerometerSuccessActual(acceleration){
-    accelerometerSuccess(acceleration);
-}
-
-function Lerp(xa,xb){
-    var delta = xa -xb;
-    return delta/4;
-}
-
+//Render-Funktion die alle 35ms aufgerufen wird.
 function update(){
     ctx.clearRect ( 0,0,9000,9000);
     
     var tx = -1 * dx * xStep + screenWidth/2;
     var ty = -1 * dy * yStep + screenHeight/2;
-    x = x - Math.min(Lerp(x, tx), 10);
-    y = y - Math.min(Lerp(y, ty), 10);
+    x = x - Math.max(-14,Math.min(Lerp(x, tx), 14));
+    y = y - Math.max(-14,Math.min(Lerp(y, ty), 14));
     
+    //Gespeicherter Kreis
     if(lockX && lockY){
         ctx.beginPath();
         ctx.arc(lockX, lockY, 50, 0, 2*Math.PI);
@@ -129,6 +131,7 @@ function update(){
         ctx.fill();
     }
     
+    //Normaler Kreis
     ctx.beginPath();
     ctx.arc(x, y, 50, 0, 2*Math.PI);
     ctx.fillStyle="black";
@@ -143,7 +146,7 @@ function update(){
     ctx.stroke();
     
 
-    
+    //Messeinteilungen
     ctx.beginPath();
     ctx.moveTo(screenWidth/2,0);
     ctx.lineTo(screenWidth/2,screenHeight);
@@ -155,14 +158,17 @@ function update(){
     ctx.stroke();
 }
 
+//Ist n ein Integer?
 function isInt(n){
     return Number(n)===n && n%1===0;
 }
 
+//Ist n ein Float?
 function isFloat(n){
         return   n===Number(n)  && n%1!==0
 }
 
+//Ist n eine Zahl?
 function isNum(n){
     if(isFloat(n) || isInt(n)){
         return true;
@@ -170,7 +176,20 @@ function isNum(n){
     return false;
 }
 
-function LockPosition(){
-    lockX = x;
-    lockY = y;
+//Funktion für "smoothe" Animation, die den zurückzulegenden Weg pro Frame berechnet
+function Lerp(xa,xb){
+    var delta = xa -xb;
+    return delta/4;
+}
+
+//Lockt die aktuelle Position der Anzeige
+function LockPosition(e){
+    var ex = e.clientX;
+    var ey = e.clientY;
+    if (ex < x + 50 && ex > x - 50 && ey < y + 50 && y > y - 50) {
+        lockX = x;
+        lockY = y;
+        lockActive = true;
+    }
+
 }

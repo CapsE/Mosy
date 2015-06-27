@@ -16,6 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
+//Globale Variablendeklaration
 var out;
 var out2;
 var canvas;
@@ -29,7 +31,7 @@ var dx = 0;
 var dy = 0;
 var lockX;
 var lockY;
-var lockPressed = false;
+var lockActive = false;
 var screenWidth = 0;
 var screenHeight = 0;
 var xStep = 0;
@@ -37,165 +39,157 @@ var yStep = 0;
 
 var app = {
     // Application Constructor
-    initialize: function() {
+    initialize: function () {
         this.bindEvents();
         canvas = document.getElementById("myCanvas");
         out = document.getElementById("out");
         out2 = document.getElementById("out2");
-        screenWidth =  window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-        screenHeight =  window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-        
-        xStep = screenWidth/20;
-        yStep = screenHeight/20;
-        
+        screenWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        screenHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+
+        xStep = screenWidth / 20;
+        yStep = screenHeight / 20;
+
         canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
         canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
         ctx = canvas.getContext('2d');
-        
+
         window.setInterval(GetAccData, 250);
-        
         window.setInterval(update, 35);
     },
+
     // Bind Event Listeners
-    //
-    // Bind any events that are required on startup. Common events are:
-    // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function () {
-        document.body.addEventListener('touchstart', function (e) { e.preventDefault(); });
         document.addEventListener('deviceready', this.onDeviceReady, false);
+
     },
+
     // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
-    onDeviceReady: function() {
+    onDeviceReady: function () {
         app.receivedEvent('deviceready');
         searching = 0;
         Alert("Device Ready");
     },
+
     // Update DOM on a Received Event
-    receivedEvent: function(id) {
+    receivedEvent: function (id) {
         var parentElement = document.getElementById(id);
         var listeningElement = parentElement.querySelector('.listening');
         var receivedElement = parentElement.querySelector('.received');
 
         listeningElement.setAttribute('style', 'display:none;');
         receivedElement.setAttribute('style', 'display:block;');
- 
+
         console.log('Received Event: ' + id);
     },
 };
 
+//Eventhandler um erfolgreiches Erhalten von Accelerometerdaten zu behandeln
 function accelerometerSuccess(a) {
-    if(isNum(a.x) && isNum(a.y)){
-        dx = a.x * -1;    
+    if (isNum(a.x) && isNum(a.y)) {
+        dx = a.x * -1;
         dy = a.y;
         out.innerHTML = "x: " + Math.floor(-1 * dx * xStep).toString() + " y: " + Math.floor(-1 * dy * yStep).toString();
-        if (lockPressed) {
+        if (lockActive) {
+            lockActive = false;
             out2.innerHTML = "saved x: " + Math.floor(-1 * dx * xStep).toString() + " y: " + Math.floor(-1 * dy * yStep).toString();
-            lockPressed = false;
         }
     }
     searching = 0;
 }
 
-function accelerometerError(){
+//Eventhandler um fehlgeschlagenes Erhalten von Accelerometerdaten zu behandeln
+function accelerometerError() {
     out.innerHTML = "Error!";
     searching = 0;
 }
 
-function GetAccData(){
-    if(searching < 1000){
+//Anforderung an den Sensor. Begrenzt auf maximal 1000 unbeantwortete Fragen.
+function GetAccData() {
+    if (searching < 1000) {
         searching += 1;
-        navigator.accelerometer.getCurrentAcceleration(accelerometerSuccessActual, accelerometerError);
-    }else{
+        navigator.accelerometer.getCurrentAcceleration(accelerometerSuccess, accelerometerError);
+    } else {
         out.innerHTML = "Still searching...";
     }
 }
 
-function accelerometerSuccessActual(acceleration){
-    accelerometerSuccess(acceleration);
-}
+//Render-Funktion die alle 35ms aufgerufen wird.
+function update() {
+    ctx.clearRect(0, 0, 9000, 9000);
 
-function Lerp(xa,xb){
-    var delta = xa -xb;
-    return delta/5;
-}
-
-function update(){
-    ctx.clearRect ( 0,0,9000,9000);
-    
-    var tx = -1 * dx * xStep + screenWidth/2;
-    var ty = -1 * dy * yStep + screenHeight/2;
+    var tx = -1 * dx * xStep + screenWidth / 2;
+    var ty = -1 * dy * yStep + screenHeight / 2;
     x = x - Math.max(-14, Math.min(Lerp(x, tx), 14));
     y = y - Math.max(-14, Math.min(Lerp(y, ty), 14));
-    
-    if(lockX && lockY){
+
+    //Gespeicherter Kreis
+    if (lockX && lockY) {
         ctx.beginPath();
-        ctx.arc(lockX, lockY, 50, 0, 2*Math.PI);
-        ctx.fillStyle="LightGray";
+        ctx.arc(lockX, lockY, 50, 0, 2 * Math.PI);
+        ctx.fillStyle = "LightGray";
         ctx.fill();
-
-        ctx.beginPath();
-        ctx.moveTo(lockX, lockY - 50);
-        ctx.lineTo(lockX, lockY + 50);
-        ctx.moveTo(lockX - 50, lockY);
-        ctx.lineTo(lockX + 50, lockY);
-        ctx.strokeStyle = "white";
-        ctx.stroke();
     }
-    
+
+    //Normaler Kreis
     ctx.beginPath();
-    ctx.arc(x, y, 50, 0, 2*Math.PI);
-    ctx.fillStyle="black";
+    ctx.arc(x, y, 50, 0, 2 * Math.PI);
+    ctx.fillStyle = "black";
     ctx.fill();
-    
+
     ctx.beginPath();
-    ctx.moveTo(x , y -50);
-    ctx.lineTo(x , y + 50);
-    ctx.moveTo(x -50, y);
-    ctx.lineTo(x +50, y);
-    ctx.strokeStyle="white";
+    ctx.moveTo(x, y - 50);
+    ctx.lineTo(x, y + 50);
+    ctx.moveTo(x - 50, y);
+    ctx.lineTo(x + 50, y);
+    ctx.strokeStyle = "white";
     ctx.stroke();
-    
 
-    
+
+    //Messeinteilungen
     ctx.beginPath();
-    ctx.moveTo(screenWidth/2,0);
-    ctx.lineTo(screenWidth/2,screenHeight);
-    ctx.moveTo(0, screenHeight/2);
-    ctx.lineTo(screenWidth,screenHeight/2);
-    ctx.strokeStyle="blue";
-    ctx.arc(screenWidth/2, screenHeight/2, 100, 0, Math.PI*2);
-    ctx.arc(screenWidth/2, screenHeight/2, screenWidth/2, 0, Math.PI*2);
+    ctx.moveTo(screenWidth / 2, 0);
+    ctx.lineTo(screenWidth / 2, screenHeight);
+    ctx.moveTo(0, screenHeight / 2);
+    ctx.lineTo(screenWidth, screenHeight / 2);
+    ctx.strokeStyle = "blue";
+    ctx.arc(screenWidth / 2, screenHeight / 2, 100, 0, Math.PI * 2);
+    ctx.arc(screenWidth / 2, screenHeight / 2, screenWidth / 2, 0, Math.PI * 2);
     ctx.stroke();
 }
 
-function isInt(n){
-    return Number(n)===n && n%1===0;
+//Ist n ein Integer?
+function isInt(n) {
+    return Number(n) === n && n % 1 === 0;
 }
 
-function isFloat(n){
-        return   n===Number(n)  && n%1!==0
+//Ist n ein Float?
+function isFloat(n) {
+    return n === Number(n) && n % 1 !== 0
 }
 
-function isNum(n){
-    if(isFloat(n) || isInt(n)){
+//Ist n eine Zahl?
+function isNum(n) {
+    if (isFloat(n) || isInt(n)) {
         return true;
     }
     return false;
 }
 
-function LockPosition(e){
-    e.preventDefault();
-    var tx = e.pageX;
-    var ty = e.pageY;
+//Funktion für "smoothe" Animation, die den zurückzulegenden Weg pro Frame berechnet
+function Lerp(xa, xb) {
+    var delta = xa - xb;
+    return delta / 4;
+}
 
-    if (tx > x - 50 && tx < x + 50 && ty > y - 50 && ty < y + 50) {
+//Lockt die aktuelle Position der Anzeige
+function LockPosition(e) {
+    var ex = e.clientX;
+    var ey = e.clientY;
+    if (ex < x + 50 && ex > x - 50 && ey < y + 50 && y > y - 50) {
         lockX = x;
         lockY = y;
-        lockPressed = true;
+        lockActive = true;
     }
-    
 
 }
